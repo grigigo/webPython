@@ -11,7 +11,7 @@
 
     <title>
         {% if title %}
-        {{ title }}
+            {{ title }}
         {% else %}
           Лабораторная работа №2
         {% endif %}
@@ -21,20 +21,26 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Лабораторная работа № 1</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">Лабораторная работа № 2</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ url_for('index') }}">Задание</a>
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" aria-current="page" href="{{ url_for('index') }}">Задание</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ url_for('posts') }}">Посты</a>
+                        <a class="nav-link {% if request.endpoint == 'args' %}active{% endif %}" aria-current="page" href="{{ url_for('args', name='privet', count=5) }}">Парамерты</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">Об авторе</a>
+                        <a class="nav-link {% if request.endpoint == 'headers' %}active{% endif %}" aria-current="page" href="{{ url_for('headers') }}">Заголовки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'form' %}active{% endif %}" aria-current="page" href="{{ url_for('form') }}">Форма</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'phone' %}active{% endif %}" aria-current="page" href="{{ url_for('phone') }}">Телефон</a>
                     </li>
                 </ul>
             </div>

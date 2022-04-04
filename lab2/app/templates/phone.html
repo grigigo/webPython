@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Номер телефончика</h1>
+
+    <form method="POST" class="is-invalid">
+        <div class="mb-3 col-3">
+            <label for="phone">Номер телефона</label>
+            <input class="form-control {% if error_msg %} is-invalid {% endif %}" type="text" name="phone" id="phone"
+                   value="{{ phone }}">
+            <div class="invalid-feedback">{{ error_msg }}</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Проверить</button>
+    </form>
+
+{% endblock %}
