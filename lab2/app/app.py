@@ -39,10 +39,10 @@ def form():
 def phone():
     error = ''
     tmp = ''
+    result = ''
     if request.method == "POST":
         phone = request.form.get("phone")
         count = 0
-        result = ''
         for elem in phone:
             if elem.isdigit():
                 count += 1
