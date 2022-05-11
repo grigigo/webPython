@@ -1,24 +1,22 @@
 from flask import Flask, render_template, session, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from my_sql_db import MySQL
 import mysql.connector as connector
-
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.login_message = 'Для доступа к данной странице необходимо пройти процедуру аутентификации.'
-login_manager.login_message_category = 'warning'
 
 app = Flask(__name__)
 application = app
 
 app.config.from_pyfile('config.py')
 
-login_manager.init_app(app)
-
 mysql = MySQL(app)
 
 CREATE_PARAMS = ['login', 'password', 'first_name', 'last_name', 'middle_name', 'role_id']
 UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
+
+from auth import init_login_manager, bp as auth_bp, check_right
+
+init_login_manager(app)
+app.register_blueprint(auth_bp)
 
 def request_params(params_list):
     params = {}
@@ -32,54 +30,16 @@ def load_roles():
         roles = cursor.fetchall()
     return roles
 
-class User(UserMixin):
-    def __init__(self, user_id, login):
-        #super().__init__()
-        self.id = user_id
-        self.login = login
-
-@login_manager.user_loader
-def load_user(user_id):
-    with mysql.connection.cursor(named_tuple=True) as cursor:
-        cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
-        db_user = cursor.fetchone()
-    if db_user:
-        return User(user_id=db_user.id, login=db_user.login)
-    return None
 
 def get_users():
     return [{'user_id': 1, 'login': 'user', 'password': 'qwerty'}]
+
 
 @app.route('/')
 def index():  # put application's code here
     return render_template('index.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
 
-    if request.method == 'POST':
-        login = request.form.get('login')
-        password = request.form.get('password')
-        remember_me = request.form.get('remember_me') == 'on'
-
-        with mysql.connection.cursor(named_tuple=True) as cursor:
-            cursor.execute('SELECT * FROM users WHERE login=%s AND password_hash=SHA2(%s, 256);', (login, password))
-            #sqlinject
-            #cursor.execute(f"SELECT * FROM users WHERE login='{login}' AND password_hash=SHA2('{password}', 256);")
-            db_user = cursor.fetchone()
-
-        if db_user:
-            login_user(User(user_id=db_user.id, login=db_user.login), remember=remember_me)
-            flash('Вы успешно прошли процедуру аутентификации.', 'success')
-            return redirect(url_for('index'))
-        flash('Были введены неверные логин и/или пароль.', 'danger')
-
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
 
 @app.route('/users')
 def users():
@@ -90,11 +50,13 @@ def users():
 
 @app.route('/users/new')
 @login_required
+@check_right('create')
 def new():
     return render_template('users/new.html', user={}, roles=load_roles())
 
 @app.route('/users/create', methods=['POST'])
 @login_required
+@check_right('create')
 def create():
     params = request_params(CREATE_PARAMS)
     with mysql.connection.cursor(named_tuple=True) as cursor:
@@ -114,6 +76,7 @@ def create():
 
 @app.route('/users/<int:user_id>')
 @login_required
+@check_right('show')
 def show(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
@@ -122,6 +85,7 @@ def show(user_id):
 
 @app.route('/users/<int:user_id>/edit')
 @login_required
+@check_right('update')
 def edit(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
@@ -130,15 +94,16 @@ def edit(user_id):
 
 @app.route('/users/<int:user_id>/update', methods=['POST'])
 @login_required
+@check_right('update')
 def update(user_id):
     params = request_params(UPDATE_PARAMS)
     params['id'] = user_id
+    if not current_user.can('assign_role'):
+        del params['role_id']
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:
-            cursor.execute('''
-                            UPDATE users SET first_name=%(first_name)s, last_name=%(last_name)s, middle_name=%(middle_name)s, role_id=%(role_id)s
-                            WHERE id=%(id)s;
-                            ''', params)
+            cursor.execute((f"UPDATE users SET {', '.join(['{0}=%({0})s'.format(k) for k, _ in params.items() if k != 'id'])}"
+                            "WHERE id=%(id)s;"), params)
             mysql.connection.commit()
         except connector.Error:
             mysql.connection.rollback()
@@ -150,6 +115,7 @@ def update(user_id):
 
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 @login_required
+@check_right('delete')
 def delete(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:

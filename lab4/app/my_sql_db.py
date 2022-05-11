@@ -8,7 +8,7 @@ class MySQL:
 
     @property
     def connection(self):
-        if not 'db' in g:
+        if 'db' not in g:
             g.db = self.connect()
         return g.db
 
@@ -25,6 +25,5 @@ class MySQL:
 
     def close_db(self, e=None):
         db = g.pop('db', None)
-
         if db is not None:
             db.close()

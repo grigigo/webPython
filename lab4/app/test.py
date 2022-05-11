@@ -13,7 +13,7 @@ def login_test(text):
     if error:
         return error
     else:
-        return True
+        return False
 
 
 def pass_test(text):
@@ -32,23 +32,15 @@ def pass_test(text):
                     is_do = True
                 elif elem not in array:
                     error.append('Введены неверные символы!')
+        if not is_up:
+            error.append('Необходима минимум одна заглавная буква!')
+        if not is_do:
+            error.append('Необходима минимум одна строчная буква!')
+        if not is_dig:
+            error.append('Необходима минимум одна цифра!')
     else:
         error.append('Минимальное кол-во символов - 8!')
-    if not is_up:
-        error.append('Необходима минимум одна заглавная буква!')
-    if not is_do:
-        error.append('Необходима минимум одна строчная буква!')
-    if not is_dig:
-        error.append('Необходима минимум одна цифра!')
     if error:
         return error
     else:
-        return True
-
-
-alph = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
-login = 'Aawo1'
-print(login_test(login))
-
-password = '34`34540076767'
-print('\n'.join(pass_test(password)))
+        return False

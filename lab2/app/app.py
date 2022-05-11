@@ -55,7 +55,7 @@ def phone():
                 if not (phone.startswith('+7') or phone.startswith('8')):
                     error = 'Недопустимый ввод. Неверное количество цифр.'
             elif count == 10:
-                if phone.startswith('8') or phone.startswith('+7'):
+                if phone.startswith('+7'):
                     error = 'Недопустимый ввод. Неверное количество цифр.'
             else:
                 error = 'Недопустимый ввод. Неверное количество цифр.'
@@ -63,7 +63,7 @@ def phone():
         if not error:
             if phone.startswith('+7'):
                 result = f'+7-{tmp[1:4]}-{tmp[4:7]}-{tmp[7:9]}-{tmp[9:]}'
-            elif phone.startswith('8'):
+            elif phone.startswith('8') and count == 11:
                 result = f'8-{tmp[1:4]}-{tmp[4:7]}-{tmp[7:9]}-{tmp[9:]}'
             else:
                 result = f'8-{tmp[:3]}-{tmp[3:6]}-{tmp[6:8]}-{tmp[8:]}'

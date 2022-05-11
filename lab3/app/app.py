@@ -19,6 +19,7 @@ class User(UserMixin):
         self.login = login
         self.password = password
 
+
 @login_manager.user_loader
 def load_user(user_id):
     for user in get_users():
@@ -30,7 +31,9 @@ def load_user(user_id):
 def get_users():
     return [{'user_id': 1, 'login': 'user', 'password': 'qwerty'}]
 
+
 app.config.from_pyfile('config.py')
+
 
 @app.route('/')
 def index():
@@ -54,7 +57,7 @@ def login():
         remember = request.form.get('remember') == 'on'
         for user in get_users():
             if user['login'] == login and user['password'] == password:
-                login_user(User(**user), remember = remember)
+                login_user(User(**user), remember=remember)
                 flash('Вы успешно прошли процедуру аутентификации!', 'success')
                 return redirect(url_for('index'))
         flash('Были введены неверные логин и/или пароль!', 'danger')

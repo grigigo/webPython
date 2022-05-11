@@ -1,10 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1 class="mb-4">Изменить пароль</h1>
+
+    <form action="{{ url_for('new_pass') }}" method="POST" style="max-width: 40rem;">
+        <div class="row mb-3">
+            <label for="old_pass" class="col-sm-4 col-form-label">Старый пароль</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control {% if old_err %} is-invalid {% endif %}" name="old_pass" id="old_pass" value="{{ old_pass or '' }}">
+                <div class="invalid-feedback">{{ old_err }}</div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="new_pass" class="col-sm-4 col-form-label">Новый пароль</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control {% if new_err %} is-invalid {% endif %}" name="new_pass" id="new_pass" value="{{ new_pass or '' }}">
+                <div class="invalid-feedback">
+                    {% for error in new_err %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="rep_pass" class="col-sm-4 col-form-label">Повторите новый пароль</label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control {% if rep_err %} is-invalid {% endif %}" name="rep_pass" id="rep_pass" value="{{ rep_pass or '' }}">
+                <div class="invalid-feedback">{{ rep_err }}</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </form>
+{% endblock %}
