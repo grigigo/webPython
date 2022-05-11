@@ -172,35 +172,29 @@ def delete(user_id):
     return redirect(url_for('users'))
 
 
-@app.route('/new_pass')
-@login_required
-def pass_page():
-    return render_template('users/new_pass.html', user=current_user)
-
-
-@app.route('/new_pass', methods=['POST'])
+@app.route('users/<int:user_id>/new_pass', methods=['POST'])
 @login_required
 def new_pass():
     if request.method == "POST":
         old_pass = request.form.get("old_pass")
-        new_pass = request.form.get("new_pass")
+        new_pas = request.form.get("new_pass")
         rep_pass = request.form.get("rep_pass")
         old_err = ''
-        new_err = pass_test(new_pass)
+        new_err = pass_test(new_pas)
         rep_err = ''
 
-        if new_pass == rep_pass:
+        if new_pas == rep_pass:
             if not new_err:
                 with mysql.connection.cursor(named_tuple=True) as cursor:
                     cursor.execute('SELECT * FROM users WHERE login=%s AND password_hash=SHA2(%s, 256);', (current_user.login, old_pass))
                     user = cursor.fetchone()
                     if user:
                         try:
-                            cursor.execute('UPDATE users SET password_hash=SHA2(%s, 256) WHERE id=%s', (new_pass, current_user.id))
+                            cursor.execute('UPDATE users SET password_hash=SHA2(%s, 256) WHERE id=%s', (new_pas, current_user.id))
                             mysql.connection.commit()
                         except connector.Error:
                             mysql.connection.rollback()
-                            flash('При удалении пользователя возникла ошибка.', 'danger')
+                            flash('При изменении пароля возникла ошибка!', 'danger')
                             return redirect(url_for('new_pass'))
                     else:
                         old_err = 'Введен неверный пароль!'
@@ -214,3 +208,5 @@ def new_pass():
         else:
             flash('Пароль успешно изменен!', 'success')
             return redirect(url_for('index'))
+    else:
+        return render_template('users/new_pass.html')
