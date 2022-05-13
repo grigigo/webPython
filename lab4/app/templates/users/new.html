@@ -5,6 +5,6 @@
 
     <h1 class="mb-5">Создание пользователя</h1>
 
-    {{ render_user_form(url_for('create'), roles, user, pass_err=pass_err, login_err=login_err) }}
+    {{ render_user_form(url_for('create'), roles, user, pass_err=pass_err, login_err=login_err, first_err=first_err, last_err=last_err) }}
 
 {% endblock %}

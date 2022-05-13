@@ -1,4 +1,4 @@
-{% macro render_user_form(url, roles, user={}, pass_err={}, login_err={}) %}
+{% macro render_user_form(url, roles, user={}, pass_err={}, login_err={}, first_err={}, last_err={}) %}
     <form action="{{ url }}" method="POST" style="max-width: 40rem;">
         {% if request.endpoint in ['create', 'new'] %}
         <div class="row mb-3">
@@ -13,9 +13,11 @@
             <div class="col-sm-10">
                 <input type="password" class="form-control {% if pass_err %} is-invalid {% endif %}" name="password" id="password" value="{{ user.password or '' }}">
                 <div class="invalid-feedback">
-                    {% for error in pass_err %}
-                        {{ error }}
-                    {% endfor %}
+                    {% if pass_err %}
+                        {% for error in pass_err %}
+                            {{ error }}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -23,13 +25,15 @@
         <div class="row mb-3">
             <label for="last_name" class="col-sm-2 col-form-label">Фамилия</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" name="last_name" id="last_name" value="{{ user.last_name or '' }}">
+                <input type="text" class="form-control {% if not last_err %} is-invalid {% endif %}" name="last_name" id="last_name" value="{{ user.last_name or '' }}">
+                <div class="invalid-feedback">Поле не может быть пустым</div>
             </div>
         </div>
         <div class="row mb-3">
             <label for="first_name" class="col-sm-2 col-form-label">Имя</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" name="first_name" id="first_name" value="{{ user.first_name or '' }}">
+                <input type="text" class="form-control {% if not first_err %} is-invalid {% endif %}" name="first_name" id="first_name" value="{{ user.first_name or '' }}">
+                <div class="invalid-feedback">Поле не может быть пустым</div>
             </div>
         </div>
         <div class="row mb-3">

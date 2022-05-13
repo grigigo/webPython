@@ -93,14 +93,17 @@ def users():
 def new():
     return render_template('users/new.html', user={}, roles=load_roles())
 
+
 @app.route('/users/create', methods=['POST'])
 @login_required
 def create():
     params = request_params(CREATE_PARAMS)
     pass_err = pass_test(params['password'])
     login_err = login_test(params['login'])
+    is_first = True if params['first_name'] else False
+    is_last = True if params['last_name'] else False
 
-    if not (pass_err or login_err):
+    if not (pass_err or login_err) and is_first and is_last:
         with mysql.connection.cursor(named_tuple=True) as cursor:
             try:
                 cursor.execute('''
@@ -116,7 +119,8 @@ def create():
         flash(f"Пользователь {params.get('login')} был успешно создан!", 'success')
         return redirect(url_for('users'))
     else:
-        return render_template('users/new.html', user=params, roles=load_roles(), pass_err=pass_err, login_err=login_err)
+        return render_template('users/new.html', user=params, roles=load_roles(), pass_err=pass_err,
+                               login_err=login_err, first_err=is_first, last_err=is_last)
 
 @app.route('/users/<int:user_id>')
 @login_required
@@ -172,7 +176,7 @@ def delete(user_id):
     return redirect(url_for('users'))
 
 
-@app.route('users/<int:user_id>/new_pass', methods=['POST'])
+@app.route('/new_pass', methods=['GET', 'POST'])
 @login_required
 def new_pass():
     if request.method == "POST":
