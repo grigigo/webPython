@@ -26,8 +26,7 @@
                                 <a class="btn btn-primary" href="{{ url_for('show', user_id=user.id) }}">Просмотр</a>
                             {% endif %}
                             {% if current_user.can('update', record=user) %}
-                                <a class="btn btn-secondary"
-                                   href="{{ url_for('edit', user_id=user.id) }}">Редактирование</a>
+                                <a class="btn btn-secondary" href="{{ url_for('edit', user_id=user.id) }}">Редактирование</a>
                             {% endif %}
                             {% if current_user.can('delete', record=user) %}
                                 <button type="button" class="btn btn-danger" data-url="{{ url_for('delete', user_id=user.id) }}" data-bs-toggle="modal"

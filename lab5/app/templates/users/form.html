@@ -1,35 +1,54 @@
-{% macro render_user_form(url, roles, current_user, user={}) %}
+{% macro render_user_form(url, roles, current_user, user={}, pass_err={}, login_err={}) %}
     <form action="{{ url }}" method="POST" style="max-width: 40rem;">
         {% if request.endpoint in ['create', 'new'] %}
-        <div class="row mb-3">
-            <label for="login" class="col-sm-2 col-form-label">Логин</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" name="login" id="login" value="{{ user.login or '' }}">
+            <div class="row mb-3">
+                <label for="login" class="col-sm-2 col-form-label">Логин</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control {% if login_err %} is-invalid {% endif %}" name="login"
+                           id="login" value="{{ user.login or '' }}">
+                    <div class="invalid-feedback">{{ login_err }}</div>
+                </div>
             </div>
-        </div>
-        <div class="row mb-3">
-            <label for="password" class="col-sm-2 col-form-label">Пароль</label>
-            <div class="col-sm-10">
-                <input type="password" class="form-control" name="password" id="password" value="{{ user.password or '' }}">
+            <div class="row mb-3">
+                <label for="password" class="col-sm-2 col-form-label">Пароль</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control {% if pass_err %} is-invalid {% endif %}" name="password" id="password"
+                           value="{{ user.password or '' }}">
+                    <div class="invalid-feedback">
+                        {% if pass_err %}
+                            {% for error in pass_err %}
+                                {{ error }}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
         {% endif %}
         <div class="row mb-3">
             <label for="last_name" class="col-sm-2 col-form-label">Фамилия</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" name="last_name" id="last_name" value="{{ user.last_name or '' }}">
+                <input type="text" class="form-control" name="last_name" id="last_name"
+                       value="{{ user.last_name or '' }}" required>
+            </div>
+            <div class="invalid-feedback">
+                Поле не может быть пустым.
             </div>
         </div>
         <div class="row mb-3">
             <label for="first_name" class="col-sm-2 col-form-label">Имя</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" name="first_name" id="first_name" value="{{ user.first_name or '' }}">
+                <input type="text" class="form-control" name="first_name" id="first_name"
+                       value="{{ user.first_name or '' }}" required>
+            </div>
+            <div class="invalid-feedback">
+                Поле не может быть пустым.
             </div>
         </div>
         <div class="row mb-3">
             <label for="middle_name" class="col-sm-2 col-form-label">Отчество</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" name="middle_name" id="middle_name" value="{{ user.middle_name or '' }}">
+                <input type="text" class="form-control" name="middle_name" id="middle_name"
+                       value="{{ user.middle_name or '' }}">
             </div>
         </div>
         {% if current_user.can('assign_role') %}
@@ -38,7 +57,9 @@
                 <div class="col-sm-10">
                     <select name="role_id" id="role_id" class="form-select">
                         {% for role in roles %}
-                            <option value="{{ role.id }}" {% if role.id == (user.role_id or '-1') | int %} selected {% endif %}>{{ role.name }}</option>
+                            {% print(roles) %}
+                            <option value="{{ role.id }}" {% if role.id == (user.role_id or '-1') | int %}
+                                    selected {% endif %}>{{ role.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
