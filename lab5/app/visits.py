@@ -70,5 +70,9 @@ def users_stat():
 @bp.route('/stats/pages')
 @check_rights('visits_admin')
 def pages_stat():
-    records = []
+    with mysql.connection.cursor(named_tuple=True) as cursor:
+        cursor.execute((
+            'SELECT path, COUNT(visit_logs.id) AS count FROM visit_logs '
+            'GROUP BY visit_logs.path ORDER BY count DESC;'))
+        records = cursor.fetchall()
     return render_template('visits/pages_stat.html', records=records)

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="title-area position-relative" style="background-image: url({{ course.bg_image.url }});">
+<div class="title-area position-relative" style="background-image: url({# course.bg_image.url #});">
     <div class="h-100 w-100 py-5 d-flex text-center position-absolute" style="background-color: rgba(0, 0, 0, 0.65);">
         <div class="m-auto">
             <h1 class="title mb-3 font-weight-bold">{{ course.name }}</h1>

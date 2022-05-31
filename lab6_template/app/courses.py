@@ -3,10 +3,12 @@ from flask_login import login_required
 
 from app import db
 from models import Category, Course, User
+from tools import CoursesFilter
 
 bp = Blueprint('courses', __name__, url_prefix='/courses')
 
 COURSES_PARAMS = ['name', 'short_desc', 'full_desc', 'author_id', 'category_id']
+PER_PAGE = 3
 
 def params():
     return { p: request.form.get(p) for p in COURSES_PARAMS }
@@ -20,10 +22,12 @@ def search_params():
 
 @bp.route('/')
 def index():
-    courses = Course.query.all()
+    page = request.args.get('page', 1, type=int)
+    courses = CoursesFilter(**search_params()).perform()
+    pagination = courses.paginate(page, PER_PAGE)
     categories = Category.query.all()
     return render_template('courses/index.html', courses=courses, categories=categories, search_params=search_params(),
-                           pagination={ 'iter_pages': lambda: [] })
+                           pagination=pagination)
 
 
 @bp.route('/new')
@@ -40,10 +44,11 @@ def create():
     db.session.commit()
 
     flash(f'Курс {course.name} был успешно создан!', 'success')
-    
+
     return redirect(url_for('courses.index'))
 
 
 @bp.route('/<int:course_id>')
-def show():
-    pass
+def show(course_id):
+    course = Course.query.get(course_id)
+    return render_template('courses/show.html', course=course)
