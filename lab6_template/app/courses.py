@@ -3,7 +3,7 @@ from flask_login import login_required
 
 from app import db
 from models import Category, Course, User
-from tools import CoursesFilter
+from tools import CoursesFilter, ImageSaver
 
 bp = Blueprint('courses', __name__, url_prefix='/courses')
 
@@ -39,11 +39,16 @@ def new():
 
 @bp.route('/create', methods=['POST'])
 def create():
-    course = Course(**params())
+
+    f = request.files.get('background_img')
+    if f and f.filename:
+        img = ImageSaver(f).save()
+
+    course = Course(**params(), background_image_id=img.id)
     db.session.add(course)
     db.session.commit()
 
-    flash(f'Курс {course.name} был успешно создан!', 'success')
+    flash(f'Курс {course.name} был успешно добавлен!', 'success')
 
     return redirect(url_for('courses.index'))
 

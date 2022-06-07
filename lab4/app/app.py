@@ -100,8 +100,8 @@ def create():
     params = request_params(CREATE_PARAMS)
     pass_err = pass_test(params['password'])
     login_err = login_test(params['login'])
-    is_first = True if params['first_name'] else False
-    is_last = True if params['last_name'] else False
+    is_first = False if params['first_name'] else True
+    is_last = False if params['last_name'] else True
 
     if not (pass_err or login_err) and is_first and is_last:
         with mysql.connection.cursor(named_tuple=True) as cursor:
@@ -199,7 +199,7 @@ def new_pass():
                         except connector.Error:
                             mysql.connection.rollback()
                             flash('При изменении пароля возникла ошибка!', 'danger')
-                            return redirect(url_for('new_pass'))
+                            return render_template('users/new_pass.html')
                     else:
                         old_err = 'Введен неверный пароль!'
             else:

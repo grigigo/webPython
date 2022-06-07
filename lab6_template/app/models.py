@@ -1,7 +1,9 @@
+import os
 import sqlalchemy as sa
 from app import db
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
+from flask import url_for
 
 
 class Category(db.Model):
@@ -52,8 +54,10 @@ class Course(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, nullable=False, server_default=sa.sql.func.now())
+    background_image_id = db.Column(db.Integer, db.ForeignKey('images.id'))
     author = db.relationship('User')
-    category = db.relationship('Category', lazy=False)
+    category = db.relationship('Category')
+    bg_image = db.relationship('Image')
 
     @property
     def rating(self):
@@ -79,3 +83,12 @@ class Image(db.Model):
 
     def __repr__(self):
         return '<Image %r>' % self.file_name
+
+    @property
+    def storage_filename(self):
+        _, ext = os.path.splitext(self.file_name)
+        return str(self.id) + ext
+
+    @property
+    def url(self):
+        return url_for('image', image_id=self.id)
