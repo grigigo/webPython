@@ -60,9 +60,10 @@ def create():
 def show(course_id):
     course = Course.query.get(course_id)
     reviews = Review.query.order_by(Review.created_at.desc()).filter(Review.course_id.ilike(course_id)).limit(5)
+    count = Review.query.order_by(Review.created_at.desc()).filter(Review.course_id.ilike(course_id)).count()
     if current_user.is_authenticated:
-        user_review = Review.query.filter(Review.user_id.ilike(current_user.id)).first()
-    return render_template('courses/show.html', course=course, reviews=reviews, user_review=user_review)
+        user_review = Review.query.filter(Review.course_id.ilike(course_id)).filter(Review.user_id.ilike(current_user.id)).first()
+    return render_template('courses/show.html', course=course, reviews=reviews, user_review=user_review, review_count=count)
 
 
 @bp.route('/<int:course_id>/create_review', methods=['POST'])

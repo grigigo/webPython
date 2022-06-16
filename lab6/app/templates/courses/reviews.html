@@ -31,8 +31,10 @@
             </div>
         {% endfor %}
 
+
         <div class="mb-5">
             {{ render_pagination(pagination, request.endpoint, {"course_id": reviews[0].course_id, "fil": fil}) }}
         </div>
+
     </section>
 {% endblock %}

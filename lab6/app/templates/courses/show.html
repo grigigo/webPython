@@ -162,9 +162,11 @@
                 </div>
             {% endfor %}
 
-            <div class="text-center">
-                <a href="{{ url_for('courses.reviews_show', course_id=course.id, fil=0) }}" class="btn btn-dark btn-lg">Полный список отзывов</a>
-            </div>
+            {% if review_count != 0 %}
+                <div class="text-center">
+                    <a href="{{ url_for('courses.reviews_show', course_id=course.id, fil=0) }}" class="btn btn-dark btn-lg">Полный список отзывов</a>
+                </div>
+            {% endif %}
         </section>
     </div>
 
