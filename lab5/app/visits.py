@@ -75,4 +75,8 @@ def pages_stat():
             'SELECT path, COUNT(visit_logs.id) AS count FROM visit_logs '
             'GROUP BY visit_logs.path ORDER BY count DESC;'))
         records = cursor.fetchall()
+    if request.args.get('download_csv'):
+        f = generate_report_file(records)
+        filename = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S') + '_users_stat.csv'
+        return send_file(f, mimetype='text/csv', as_attachment=False, attachment_filename=filename)
     return render_template('visits/pages_stat.html', records=records)
